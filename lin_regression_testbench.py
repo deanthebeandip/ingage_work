@@ -151,8 +151,14 @@ def main():
     fold_size_0 = int(num_0/fold_num)
     fold_size_1 = int(num_1/fold_num)
 
+
+    #initialize some trackers to track accuracy
+    index = []
+    accuracy_track = []
+
     #START HERE FOR THE FOR LOOPS
     for fold in range(fold_num):
+        index.append(fold)
 
         test_data = all_data.X[fold* fold_size_0 : (fold + 1)* (fold_size_0), :] #part 1
         test_data = np.concatenate((test_data, all_data.X[num_0 + fold*fold_size_1 : num_0 + (fold+1)*fold_size_1, :]), 0) #part 2
@@ -170,50 +176,35 @@ def main():
         train_data = Data(train_data, train_data_y)
         print("Finished loading data")
 
-    #create classifier
-    clf = LogisticRegression(solver = 'lbfgs')
-    #train the classifier
-    clf.fit(train_data.X, train_data.y)
+        #create classifier
+        clf = LogisticRegression(solver = 'lbfgs')
+        #train the classifier
+        clf.fit(train_data.X, train_data.y)
 
-    # m coef & b intercept
-    print(clf.intercept_)
-    print(clf.coef_)
+        # m coef & b intercept
+        print(clf.intercept_)
+        print(clf.coef_)
 
-    # accuracy
-    print(clf.score(train_data.X, train_data.y))
+        # accuracy
+        print(clf.score(train_data.X, train_data.y))
 
-    #predict
-    print(clf.predict(test_data.X))
-    print(clf.predict_proba(test_data.X))
+        #predict
+        print("Predict Gang")
+        print(clf.predict(test_data.X))
+        print(clf.predict_proba(test_data.X))
 
-    dataplot = np.linspace(0, all_data.y.shape[0] ,200)
+        accuracy_track.append( clf.score(test_data.X, test_data.y))
 
 
 
+    plt.plot(index, accuracy_track, 'r', label="Accuracy Track")
+    plt.title('Accuracy Across 10 Folds')
+    plt.xlabel("Fold #")
+    plt.ylabel("Accuracy")
+    labelsh = ["Accuracy"]
+    plt.legend(labelsh)
+    plt.show()
 
-    '''
-        index = []
-        train_error = []
-        test_error =  []
-
-        for i in range(0,11):
-            index.append(i)
-
-            model = PolynomialRegression(m = i)
-            model.coef_ = np.zeros(2)
-            model.fit(train_data.X, train_data.y)
-            train_error.append(model.rms_error(train_data.X, train_data.y) )
-            test_error.append(model.rms_error(test_data.X, test_data.y) )
-
-        plt.plot(index, train_error , 'r', label="Training Error")
-        plt.plot(index, test_error  , 'g', label="Testing Error")
-        plt.title('Fold #'+ str(fold+1))
-        plt.xlabel("M value")
-        plt.ylabel("RMSE")
-        labelsh = ["Training Error", "Testing Error" ]
-        plt.legend(labelsh)
-        plt.show()
-    '''
 
     print("Done with Main!")
 
